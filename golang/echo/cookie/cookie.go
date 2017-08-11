@@ -39,12 +39,12 @@ func readAllCookies(c echo.Context) error {
 func main() {
 	// Echo instance
 	e := echo.New()
-	e.Use(middleware.BasicAuth(func(username, password string, c echo.Context) bool {
-		if username == "joe" && password == "secret" {
-			return true
-		}
-		return false
-	}))
+	// e.Use(middleware.BasicAuth(func(username, password string, c echo.Context) bool {
+	// 	if username == "joe" && password == "secret" {
+	// 		return true
+	// 	}
+	// 	return false
+	// }))
 	// Middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
