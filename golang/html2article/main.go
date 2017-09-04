@@ -8,6 +8,7 @@ func main() {
 	urlStr := "https://www.leiphone.com/news/201602/DsiQtR6c1jCu7iwA.html"
 	urlStr = "http://book.zongheng.com/chapter/688697/38691248.html"
 	urlStr = "http://www.76wx.com/book/190/3202125.html"
+	urlStr = "http://book.zongheng.com/chapter/688697/38712592.html"
 	ext, err := html2article.NewFromUrl(urlStr)
 	if err != nil {
 		panic(err)
