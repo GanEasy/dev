@@ -1,9 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo"
+	"github.com/microcosm-cc/bluemonday"
+	"github.com/russross/blackfriday"
 	"github.com/yizenghui/reader"
 )
 
@@ -22,7 +25,15 @@ func main() {
 		}
 		md, _ := reader.Read(urlStr)
 
-		return c.String(http.StatusOK, md)
+		input := []byte(md)
+		unsafe := blackfriday.MarkdownCommon(input)
+		content := bluemonday.UGCPolicy().SanitizeBytes(unsafe)
+
+		html := fmt.Sprintf(`<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+			<link rel="preload" href="https://yize.gitlab.io/css/main.css" as="style" />
+			%v`, string(content[:]))
+
+		return c.HTML(http.StatusOK, html)
 	})
 
 	// Start server
