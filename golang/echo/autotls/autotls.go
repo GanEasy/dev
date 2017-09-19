@@ -5,14 +5,13 @@ import (
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
-	"golang.org/x/crypto/acme/autocert"
 )
 
 func main() {
 	e := echo.New()
-	// e.AutoTLSManager.HostPolicy = autocert.HostWhitelist("<DOMAIN>")
-	// Cache certificates
-	e.AutoTLSManager.Cache = autocert.DirCache("cache")
+	// e.AutoTLSManager.HostPolicy = autocert.HostWhitelist("<your_domain>")
+	// Store the certificate to avoid issues with rate limits (https://letsencrypt.org/docs/rate-limits/)
+	// e.AutoTLSManager.Cache = autocert.DirCache("<path to store key and certificate>")
 	e.Use(middleware.Recover())
 	e.Use(middleware.Logger())
 	e.GET("/", func(c echo.Context) error {
