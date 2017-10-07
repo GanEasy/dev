@@ -1,11 +1,13 @@
 package main
 
 import (
+	"bytes"
 	"crypto/md5"
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
-	"image/jpeg"
+	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -35,6 +37,18 @@ func GetMd5String(s string) string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
+// SaveImg 保存图片到本地
+func SaveImg(imageURL, saveName string) (n int64, err error) {
+	out, err := os.Create(saveName)
+	defer out.Close()
+	resp, err := http.Get(imageURL)
+	pix, err := ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	n, err = io.Copy(out, bytes.NewReader(pix))
+	return
+}
+
+// PrintHandler ...
 func PrintHandler(u string, w http.ResponseWriter, r *http.Request) {
 
 	imgname := GetMd5String(u)
@@ -45,35 +59,35 @@ func PrintHandler(u string, w http.ResponseWriter, r *http.Request) {
 	_, err := os.Stat(imgpath)
 	if os.IsNotExist(err) {
 		core.SaveImg(u, imgpath)
+		src, err := imaging.Open(imgpath)
+		if err != nil {
+			log.Fatalf("Open failed: %v", err)
+		}
+		// src = imaging.Resize(src, 256, 0, imaging.Lanczos)
+		src = imaging.Resize(src, 350, 0, imaging.Lanczos)
+		src = imaging.CropAnchor(src, 350, 200, imaging.Center)
+		err = imaging.Save(src, imgpath)
+		if err != nil {
+			log.Fatalf("Save failed: %v", err)
+		}
 	}
-
-	src, err := imaging.Open(imgpath)
-	if err != nil {
-		log.Fatalf("Open failed: %v", err)
-	}
-	// src = imaging.Resize(src, 256, 0, imaging.Lanczos)
-	src = imaging.Resize(src, 350, 0, imaging.Lanczos)
-	src = imaging.CropAnchor(src, 350, 200, imaging.Center)
-
-	// http.ServeFile(w, r, imgpath)
-
-	// w.Header().Set("Content-Type", "image/gif")
-	w.Header().Set("Content-Type", "image/jpeg")
-
-	jpeg.Encode(w, src, &jpeg.Options{Quality: 80})
-	// gif.Encode(w, src, &gif.Options{NumColors: 256})
-	// png.Encode(w, src)
-
-	// imgpath := "./13.jpg"
-	// core.SaveImg("http://localhost:1323/2015052700230736104.jpg", imgpath)
-
-	// // if !FileExist(imgpath) {
-	// // 	w.Write([]byte("Error:Image Not Found."))
-	// // 	return
-	// // }
-	// http.ServeFile(w, r, imgpath)
-	// os.Remove(imgpath)
+	http.ServeFile(w, r, imgpath)
 }
+
+// func DownloadHandler(w http.ResponseWriter, r *http.Request) {
+// 	vars := mux.Vars(r)
+// 	imageid := vars["imgid"]
+// 	if len([]rune(imageid)) != 16 {
+// 		w.Write([]byte("Error:ImageID incorrect."))
+// 		return
+// 	}
+// 	imgpath := ImageID2Path(imageid)
+// 	if !FileExist(imgpath) {
+// 		w.Write([]byte("Error:Image Not Found."))
+// 		return
+// 	}
+// 	http.ServeFile(w, r, imgpath)
+// }
 
 func main() {
 	e := echo.New()

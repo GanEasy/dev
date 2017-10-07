@@ -1,2 +1,5 @@
 *.exe
 *.7z
+*.db
+/img/file/*.jpg
+/rfui/node_modules/
