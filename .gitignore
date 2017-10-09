@@ -3,3 +3,4 @@
 *.db
 /img/file/*.jpg
 /rfui/node_modules/
+/rfui/

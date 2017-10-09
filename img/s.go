@@ -58,6 +58,10 @@ func PrintHandler(u string, w http.ResponseWriter, r *http.Request) {
 	// 如果本地服务器不存在缓存，再去拿
 	_, err := os.Stat(imgpath)
 	if os.IsNotExist(err) {
+
+		// todo 文件夹分层
+		// os.MkdirAll(path.Dir(fn))
+		// ... = os.Create(fn)
 		core.SaveImg(u, imgpath)
 		src, err := imaging.Open(imgpath)
 		if err != nil {
