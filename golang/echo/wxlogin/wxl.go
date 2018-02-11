@@ -13,8 +13,8 @@ import (
 )
 
 const (
-	wxAppId           = "wxdd75ceb6bd54c179"               // 填上自己的参数
-	wxAppSecret       = "3a71070c1ba4e56f47ee4657e917a4ef" // 填上自己的参数
+	wxAppId           = "wx702b93aef72f3549"               // 填上自己的参数
+	wxAppSecret       = "8b69f45fc737a938cbaaffc05b192394" // 填上自己的参数
 	oauth2RedirectURI = "http://wdt.readfollow.com/sign"   // 填上自己的参数
 	oauth2Scope       = "snsapi_userinfo"                  // 填上自己的参数
 )
