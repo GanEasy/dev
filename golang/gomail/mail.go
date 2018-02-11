@@ -2,6 +2,29 @@ package main
 
 import gomail "gopkg.in/gomail.v2"
 
+func coutom() {
+	m := gomail.NewMessage()
+	// m.SetHeader("From", "admin2@mail.349420.com")
+	m.SetHeader("From", "hr@mail4.fs93zp.com")
+	// m.SetHeader("From", "yize19@tom.com")
+	m.SetHeader("To", "2325379239@qq.com")
+	// m.SetAddressHeader("Cc", "zenghuitrue@gmail.com", "易增辉")
+	// m.SetAddressHeader("Cc", "245561237@qq.com", "易增辉")
+	m.SetHeader("Subject", "老板亲启邀请函")
+	m.SetBody("text/html", `老板，带上你的信用卡，跟我一起征战沙场！`)
+	// m.Attach("/home/Alex/lolcat.jpg")
+
+	// d := gomail.NewDialer("smtp.tom.com", 25, "yize19@tom.com", "qq123456")
+
+	// d := gomail.NewDialer("mail.349420.com", 25, "admin2@mail.349420.com", "123456")
+	d := gomail.NewDialer("mail4.fs93zp.com", 25, "hr@mail4.fs93zp.com", "93zpmailpp")
+	// Send the email to Bob, Cora and Dan.
+	if err := d.DialAndSend(m); err != nil {
+		panic(err)
+	}
+
+}
+
 func outlook() {
 	m := gomail.NewMessage()
 	m.SetHeader("From", "readfollow@outlook.com")
@@ -45,8 +68,8 @@ func aliyun() {
 }
 
 func main() {
-	outlook()
-
+	// outlook()
+	coutom()
 	// m := gomail.NewMessage()
 	// m.SetHeader("From", "GanEasy@qq.com")
 	// m.SetHeader("To", "2325379239@qq.com")
