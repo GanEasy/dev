@@ -34,6 +34,7 @@ func main() {
 	e.Use(middleware.Recover())
 	e.GET("/login", Login)
 	e.GET("/sign", Sign)
+	e.GET("/user", User)
 	e.Logger.Fatal(e.Start(":3345"))
 }
 
