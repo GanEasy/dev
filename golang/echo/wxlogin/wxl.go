@@ -60,16 +60,32 @@ func Sign(c echo.Context) (err error) {
 	}
 	log.Printf("token: %+v\r\n", token)
 
-	userinfo, err := mpoauth2.GetUserInfo(token.AccessToken, token.OpenId, "", nil)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	return c.JSON(http.StatusOK, userinfo)
+	return c.JSON(http.StatusOK, token)
 }
 
 //Login 答卷完成记录提交 这里判断提交不太好用。直接用get了
 func Login(c echo.Context) error {
 	AuthCodeURL := mpoauth2.AuthCodeURL(wxAppId, oauth2RedirectURI, "snsapi_base", "start_sign")
 	return c.Redirect(http.StatusMovedPermanently, AuthCodeURL)
+}
+
+//User 获取用户信息
+func User(c echo.Context) (err error) {
+
+	token := c.QueryParam("token")
+	if token == "" {
+		return errors.New("token 参数为空")
+	}
+
+	openid := c.QueryParam("openid")
+	if openid == "" {
+		return errors.New("openid 参数为空")
+	}
+
+	userinfo, err := mpoauth2.GetUserInfo(token, openid, "", nil)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	return c.JSON(http.StatusOK, userinfo)
 }
