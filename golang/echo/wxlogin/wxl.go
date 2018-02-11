@@ -61,6 +61,12 @@ func Sign(c echo.Context) (err error) {
 	}
 	log.Printf("token: %+v\r\n", token)
 
+	if state == "start_sign" {
+		// wdt
+		url := fmt.Sprintf(`http://wdt.readfollow.com/?token=%v&openid=%v`, token.AccessToken, token.OpenId)
+		return c.Redirect(http.StatusMovedPermanently, url)
+	}
+	//
 	return c.JSON(http.StatusOK, token)
 }
 
