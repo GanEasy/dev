@@ -1,6 +1,11 @@
 package main
 
-import gomail "gopkg.in/gomail.v2"
+import (
+	"fmt"
+	"io"
+
+	gomail "gopkg.in/gomail.v2"
+)
 
 func coutom() {
 	m := gomail.NewMessage()
@@ -67,9 +72,56 @@ func aliyun() {
 	}
 }
 
+func aliyun_company() {
+
+	m := gomail.NewMessage()
+	m.SetHeader("From", "info@mail.kaipingshi93zp.com")
+	// m.SetHeader("From", "yize19@tom.com")
+	m.SetHeader("To", "2325379239@qq.com")
+	// m.SetAddressHeader("Cc", "zenghuitrue@gmail.com", "易增辉")
+	// m.SetAddressHeader("Cc", "245561237@qq.com", "易增辉")
+	m.SetHeader("Subject", "Hello!")
+	m.SetBody("text/html", "Hello <b>Bob</b> and <i>Cora</i>!")
+	// m.Attach("/home/Alex/lolcat.jpg")
+
+	// d := gomail.NewDialer("smtp.tom.com", 25, "yize19@tom.com", "qq123456")
+	// d := gomail.Dialer{Host: "smtp.qq.com", Port: 465, Username: "1123123123@qq.com", Password: "ocozlhmwsvxhbidd",SSL:true}
+	// d := gomail.Dialer{Host: "smtpdm.aliyun.com", Port: 465, Username: "info@alimail.kaipingshi93zp.com", Password: "93ZP2018com", SSL: true}
+
+	//smtp.mxhichina.com
+	d := gomail.NewDialer("smtpdm.aliyun.com", 465, "info@mail.kaipingshi93zp.com", "93ZP2018com")
+	// d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
+
+	// Send the email to Bob, Cora and Dan.
+	if err := d.DialAndSend(m); err != nil {
+		panic(err)
+	}
+}
+
+func postfix() {
+	m := gomail.NewMessage()
+	m.SetHeader("From", "121258121@qq.com")
+	m.SetHeader("To", "2325379239@qq.com")
+	m.SetHeader("Subject", "Hello!")
+	m.SetBody("text/plain", "Hello!")
+
+	s := gomail.SendFunc(func(from string, to []string, msg io.WriterTo) error {
+		// Implements you email-sending function, for example by calling
+		// an API, or running postfix, etc.
+		fmt.Println("From:", from)
+		fmt.Println("To:", to)
+		return nil
+	})
+
+	if err := gomail.Send(s, m); err != nil {
+		panic(err)
+	}
+}
+
 func main() {
 	// outlook()
-	coutom()
+	// coutom()
+	aliyun_company()
 	// m := gomail.NewMessage()
 	// m.SetHeader("From", "GanEasy@qq.com")
 	// m.SetHeader("To", "2325379239@qq.com")
