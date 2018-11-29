@@ -10,9 +10,9 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
-	"time"
 )
 
 func substr(s string, pos, length int) string {
@@ -24,74 +24,56 @@ func substr(s string, pos, length int) string {
 	return string(runes[pos:l])
 }
 
-//删除目录下的文件信息
-//dirpath 目录路径
-func delDirFile(dirpath string) {
-	//读取目录信息
-	dir, err := ioutil.ReadDir(dirpath)
+// 判断所给路径文件/文件夹是否存在(返回true是存在)
+func isExist(path string) bool {
+	_, err := os.Stat(path) //os.Stat获取文件信息
 	if err != nil {
-		return
-	}
-
-	//当前系统的时间
-	ct := int32(time.Now().Unix())
-	//72小时
-	spt := int32(72 * 3600)
-
-	for _, file := range dir {
-		//读取到的是目录
-		if file.IsDir() {
-			// subDir := dirpath + `/` + file.Name()
-			subDir := fmt.Sprintf("%s/%s", dirpath, file.Name())
-			// dir2, _ := ioutil.ReadDir(subDir)
-			// fmt.Println(subDir, dir2)
-			delDirFile(subDir)
-			// continue
+		if os.IsExist(err) {
+			return true
 		}
-		//文件的最后修改时间
-		tdate := file.ModTime()
-		ft := int32(tdate.Unix())
-
-		//3天前的文件就删除
-		if ft < ct-spt {
-			os.Remove(dirpath + "/" + file.Name())
-			fmt.Println("del file:", dirpath+"/"+file.Name())
-		}
+		return false
 	}
+	return true
 }
 
 //getDirAllFile 获取目录下所有文件
 //dirpath 目录路径
-func getDirAllFile(dirpath string) {
+func GetDirAllImgFile(dirpath string) ([]os.FileInfo, error) {
 	//读取目录信息
 	dir, err := ioutil.ReadDir(dirpath)
 	if err != nil {
-		return
+		return dir, err
 	}
 
-	//当前系统的时间
-	ct := int32(time.Now().Unix())
-	//72小时
-	spt := int32(72 * 3600)
+	var ret []os.FileInfo
 
 	for _, file := range dir {
 		//读取到的是目录
-		if file.IsDir() {
+		if file.IsDir() { //跳过
 			continue
 		}
-		//文件的最后修改时间
-		tdate := file.ModTime()
-		ft := int32(tdate.Unix())
 
-		//3天前的文件就删除
-		if ft < ct-spt {
-			os.Remove(dirpath + "/" + file.Name())
+		suffix := path.Ext(file.Name())
+
+		//如果是 jpg 或者 png 装起来
+		if suffix == `.JPG` || suffix == `.JPEG` || suffix == `.jpg` || suffix == `.PNG` || suffix == `.png` {
+			ret = append(ret, file)
 		}
-		fmt.Println("del file:", dirpath+"/"+file.Name())
+
 	}
+	return ret, nil
 }
 
-func copy(src, dst string) (int64, error) {
+func Copy(src, dst string) (int64, error) {
+
+	tp := path.Dir(strings.Replace(dst, "\\", "/", -1))
+	if !isExist(tp) {
+		err := os.MkdirAll(tp, os.ModePerm)
+		if err != nil {
+			return 0, err
+		}
+	}
+
 	sourceFileStat, err := os.Stat(src)
 	if err != nil {
 		return 0, err
@@ -115,16 +97,18 @@ func copy(src, dst string) (int64, error) {
 	return nBytes, err
 }
 
-func getParentDirectory(dirctory string) string {
+func GetParentDirectory(dirctory string) string {
 	return substr(dirctory, 0, strings.LastIndex(dirctory, "/"))
 }
-func getThisDirName(dirctory string) string {
+func GetThisDirName(dirctory string) string {
+	dirctory = path.Dir(strings.Replace(dirctory, "\\", "/", -1))
 	ll := strings.LastIndex(dirctory, "/") + 1
 	al := len(dirctory)
+	fmt.Println(ll, al-ll)
 	return substr(dirctory, ll, al-ll)
 }
 
-func getCurrentDirectory() string {
+func GetCurrentDirectory() string {
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {
 		log.Fatal(err)
@@ -132,12 +116,3 @@ func getCurrentDirectory() string {
 	fmt.Println(dir)
 	return strings.Replace(dir, "\\", "/", -1)
 }
-
-// 当前程序执行文件夹名
-var thisDirName = ""
-
-// 抓取封面文件夹
-var coverDirName = "cover"
-
-// 输出图片目录
-var echoDirs = []string{`a`, `b`, `c`}
